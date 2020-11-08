@@ -1,0 +1,126 @@
+---
+title: "Multiple Pages"
+output: flexdashboard::flex_dashboard
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+library(readr)
+Last_6_months <- read_csv("Last 6 months(2).csv")
+
+```
+Visualizations {data-orientation=rows}
+===================================  
+    
+Row {data-height=400}
+-------------------------------------
+    
+### Chart 1
+    
+```{r,fig.width=15, fig.height=3.5}
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+family_electricity_consumption=data.frame("Month"=c("02.2020","03.2020","04.2020","05.2020","06.2020","07.2020","08.2020"),
+ "Electricityfee"=c(144.56,197.99,255.23,328.41,315.26,351.22,315.91),
+ "Monthlyusage"=c(413.0286,565.6857,729.2286,938.3143,900.7429,1003.486,902.6))
+
+
+family_electricity_consumption%>%
+  ggplot(aes(y=`Monthlyusage`,x=Month,group=1))+geom_line()+ggtitle("(Family) Electricity Consumption during COVID")+ annotate("rect", xmin = 02.2020, xmax =
+08.2020, ymin = 725, ymax = 1010,alpha = .1,fill = "blue")
+                             
+
+
+```
+
+
+Row{data_height=400}
+----------------------------
+###   Chart2
+
+```{r fig.width=15, fig.height=3.5}
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+value<-dplyr::select(Last_6_months,Date,NSW,VIC,QLD,SA,WA,TAS,NT,ACT)%>%
+  filter(Date>="July-05"& Date<="July-18")%>%
+pivot_longer(col=-Date,values_to="value",names_to="variable")
+
+p<-value%>%ggplot(aes(x=Date,y=value,fill=variable))+geom_bar(stat="identity")+facet_wrap(~variable,scales = "free")+ylab("confirmed case")+ggtitle("different states confirmed cases in July ")
+
+p+theme(axis.text.x = element_text(angle=45, hjust = 1))
+
+
+
+```
+
+
+Row{data_height=400}
+----------------------------
+###   Chart3
+
+```{r fig.width=15, fig.height=3.5}
+library(readr)
+WHO_COVID_19_global_data <- read_csv("C:/Users/zhang/OneDrive/WHO-COVID-19-global-data.csv")
+p1<-filter(WHO_COVID_19_global_data,WHO_COVID_19_global_data$Country=="Australia")
+
+p3<-data.frame(p1)
+shade <- data.frame(x1=c(as.Date('2020-03-23'),as.Date('2020-07-07')), 
+                   x2=c(as.Date('2020-05-15'),as.Date('2020-11-08')), 
+                   y1=c(-Inf,-Inf), y2=c(Inf,Inf))
+library(ggplot2)
+library(dplyr)
+  ggplot(p3,aes(x=Date_reported,y=New_cases))+geom_rect(data=shade, inherit.aes = F,
+            aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2,colour="Melbourne Lockdown"))+geom_point()+xlab("Date")+ylab("New cases")+ggtitle("COVID")
+
+
+
+
+
+```
+
+   
+Column {data-width=150}
+-------------------------------------
+### Chart 4
+
+```{r}
+
+df_Onlinepurchase=data.frame("Onlinepurchase"=c("Pasta","Eggs","Canned meals","Laundry","Tea","Multi purpose cleaners","Bottled water","Rice","Flour","Shelf stable milk","toilet paper","Coffee","Frozen vegetable","Cooking Oil"),
+  "Purchaseincrease"=c(0.76,0.72,0.71,0.70,0.62,0.61,0.59,0.58,0.55,0.50,0.51,0.48,0.42,0.40))
+
+  
+df_Onlinepurchase1<- df_Onlinepurchase %>% mutate(Purchaseincrease = paste0(round(Purchaseincrease*100), "%"))
+
+ggplot(df_Onlinepurchase1,aes(x="",y="Purchaseincrease",fill=Onlinepurchase)) + geom_bar(width = 1,stat = "identity")+coord_polar("y",start=0)+theme_void()+geom_text(aes(label =Purchaseincrease),position = position_stack(vjust = 0.5))+ggtitle("Australia Online purchase increase during COVID")+scale_color_viridis_c()
+
+
+```   
+ 
+### Chart 5
+    
+```{r}
+
+df<-data.frame("Month"=c("01.2020","02.2020","03.2020","04.2020","05.2020","06.2020",
+"07.2020","08.2020","09.2020"),
+              "Employmentrate"=c(0.626,0.626,0.625,0.595,0.582,0.593,0.598,0.604,0.603))
+              
+
+df1<- df %>% mutate(Employmentrate = paste0(round(Employmentrate*100), "%"))
+
+ggplot(data=df1, aes(x=Month, y=Employmentrate)) + geom_bar(position = 'dodge', stat='identity')+geom_text(aes(label=Employmentrate), position=position_dodge(width=0.9), vjust=-0.25)+ylab("Employment rate")+ggtitle("Australia Employment rate")
+
+```
